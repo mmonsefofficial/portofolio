@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>M.M - Portfolio</title>
+    
+    <link rel="icon" type="image/png" href="profile.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Global Styles & Dynamic Background --- */
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Poppins', sans-serif; /* Changed to Poppins for better Mobile Typography */
+            scroll-behavior: smooth; 
+            cursor: none; 
+            -webkit-tap-highlight-color: transparent; /* Removes blue tap box on Android */
+        }
+
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        /* --- DEFAULT: DARK MODE --- */
+        body {
+            background: linear-gradient(-45deg, #0b0c10, #1f2833, #0b0c10, #162129);
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+            color: #e2e8f0; /* Slightly brighter text for better mobile contrast */
+            position: relative;
+            -webkit-user-select: none; -ms-user-select: none; user-select: none;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        input, textarea, select {
+            -webkit-user-select: text; -ms-user-select: text; user-select: text;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- Ambient Floating Orbs --- */
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px);
+            z-index: -1; animation: float 20s infinite alternate ease-in-out;
+            transition: background 0.5s ease;
+            will-change: transform; /* Performance boost for mobile */
+        }
+        .orb-1 { width: 300px; height: 300px; background: rgba(69, 162, 158, 0.4); top: 10%; left: 15%; }
+        .orb-2 { width: 400px; height: 400px; background: rgba(102, 252, 241, 0.3); bottom: 20%; right: 10%; animation-delay: -5s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 100px) scale(1.2); }
+        }
+
+        /* --- Custom Neon Cursor --- */
+        .cursor {
+            width: 20px; height: 20px; border: 2px solid #66fcf1;
+            border-radius: 50%; position: fixed; pointer-events: none;
+            transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s, background-color 0.3s, border-color 0.5s;
+            z-index: 9999; box-shadow: 0 0 10px #66fcf1;
+        }
+        .cursor.hovering {
+            width: 50px; height: 50px; background-color: rgba(102, 252, 241, 0.1); border-color: #45a29e;
+        }
+
+        /* --- Floating Pill Navigation Bar --- */
+        nav {
+            position: fixed; top: 25px; left: 50%; transform: translateX(-50%); 
+            width: 90%; max-width: 1200px; background: rgba(11, 12, 16, 0.85); /* Increased opacity for readability */
+            padding: 12px 30px; display: flex; justify-content: space-between; align-items: center;
+            z-index: 1000; backdrop-filter: blur(15px); transition: background 0.5s ease, border-color 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
+        }
+        
+        .brand { display: flex; align-items: center; gap: 15px; }
+        .profile-pic {
+            width: 45px; height: 45px; border-radius: 50%; object-fit: cover; transition: border-color 0.5s ease;
+            border: 2px solid #66fcf1; box-shadow: 0 0 10px rgba(102, 252, 241, 0.5); 
+        }
+        nav h2 { color: #ffffff; text-shadow: 0 0 10px rgba(102, 252, 241, 0.5); margin: 0; font-size: 1.2rem; font-weight: 600; transition: color 0.5s ease; }
+        nav ul { list-style: none; display: flex; gap: 20px; align-items: center;}
+        nav ul li a {
+            color: #8892b0; text-decoration: none; font-weight: 600; font-size: 0.95rem;
+            transition: all 0.3s ease; padding: 8px 15px; border-radius: 20px; white-space: nowrap;
+        }
+        nav ul li a:hover { color: #66fcf1; }
+        nav ul li a.active {
+            color: #0b0c10; background-color: #66fcf1; box-shadow: 0 0 15px rgba(102, 252, 241, 0.4);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: transparent; border: none; cursor: pointer; color: #8892b0;
+            display: flex; align-items: center; justify-content: center;
+            transition: color 0.3s ease, transform 0.3s ease; padding: 5px; border-radius: 50%;
+        }
+        .theme-toggle:hover { color: #66fcf1; transform: scale(1.15); }
+        .theme-toggle svg { width: 22px; height: 22px; fill: currentColor; }
+
+        /* --- Layout & Sections --- */
+        section { 
+            min-height: 100vh; /* Fallback */
+            min-height: 100svh; /* Stable for mobile browsers */
+            padding: 120px 10% 80px; display: flex; flex-direction: column; justify-content: center; position: relative; 
+        }
+        h1 { font-size: 4rem; color: #ffffff; margin-bottom: 15px; text-align: center; transition: color 0.5s ease; line-height: 1.1; font-weight: 700; }
+        .typewriter-container { font-size: 1.8rem; color: #66fcf1; text-align: center; margin-bottom: 30px; height: 40px; transition: color 0.5s ease; font-weight: 300;}
+        .cursor-blink { animation: blink 0.8s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        h2.section-title { font-size: 2.8rem; color: #ffffff; margin-bottom: 40px; text-align: center; text-shadow: 0 0 15px rgba(102, 252, 241, 0.4); transition: color 0.5s ease; font-weight: 700; }
+        p.subtitle { font-size: 1.1rem; line-height: 1.8; max-width: 800px; margin: 0 auto; text-align: center; color: #c5c6c7; }
+        .hidden { opacity: 0; transform: translateY(60px) scale(0.95); transition: all 1.2s cubic-bezier(0.23, 1, 0.32, 1); }
+        .show { opacity: 1; transform: translateY(0) scale(1); }
+
+        /* --- Projects Grid --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; width: 100%; }
+        .card {
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1); border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px 30px; border-radius: 20px; transition: transform 0.4s, box-shadow 0.4s, background 0.4s;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+        }
+        .card:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.08); box-shadow: 0 20px 40px rgba(102, 252, 241, 0.15); }
+        .card h3 { color: #66fcf1; margin-bottom: 15px; font-size: 1.6rem; transition: color 0.5s ease; font-weight: 600; }
+        .card p { line-height: 1.7; font-size: 1rem; color: #c5c6c7;}
+
+        /* --- Contact Form Styles --- */
+        .contact-form {
+            max-width: 600px; margin: 40px auto 0; display: flex; flex-direction: column; gap: 20px; width: 100%;
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1); border-left: 1px solid rgba(255, 255, 255, 0.1); transition: background 0.5s ease;
+        }
+        .contact-form input, .contact-form select, .contact-form textarea {
+            width: 100%; padding: 15px; background: rgba(0, 0, 0, 0.2); transition: background 0.5s ease, color 0.5s ease, border-color 0.3s;
+            border: 1px solid rgba(102, 252, 241, 0.3); border-radius: 10px; color: #ffffff; font-size: 1rem; outline: none; 
+            font-family: 'Poppins', sans-serif;
+        }
+        .contact-form select option { background: #1f2833; color: #ffffff; }
+        .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { border-color: #66fcf1; box-shadow: 0 0 15px rgba(102, 252, 241, 0.3); }
+        .contact-form button {
+            background: transparent; color: #66fcf1; padding: 15px; border: 2px solid #66fcf1; border-radius: 10px; font-size: 1.1rem;
+            font-weight: bold; transition: all 0.3s; position: relative; overflow: hidden; z-index: 1; cursor: pointer;
+        }
+        .contact-form button::before { content: ''; position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: #66fcf1; transition: width 0.3s; z-index: -1; }
+        .contact-form button:hover::before { width: 100%; }
+        .contact-form button:hover { color: #0b0c10; box-shadow: 0 0 20px rgba(102, 252, 241, 0.6); }
+
+        /* --- Complex Footer Styles --- */
+        .complex-footer {
+            background: #0b0c10; padding: 80px 10% 30px; border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: 50px; transition: background 0.5s ease;
+        }
+        .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 50px; margin-bottom: 60px; }
+        .footer-left h3 { color: #ffffff; font-size: 1.8rem; margin-bottom: 5px; transition: color 0.5s ease; }
+        .footer-title { color: #8892b0; font-style: italic; font-size: 1rem; margin-bottom: 25px; }
+        .social-icons { display: flex; gap: 20px; flex-wrap: wrap; }
+        .social-icons a { color: #c5c6c7; transition: color 0.3s, transform 0.3s; display: inline-block; }
+        .social-icons a:hover { color: #66fcf1; transform: translateY(-3px); }
+        .social-icons svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .footer-right { display: flex; gap: 80px; flex-wrap: wrap; }
+        .footer-column { display: flex; flex-direction: column; gap: 12px; }
+        .footer-column h4 { color: #ffffff; font-size: 1.2rem; margin-bottom: 10px; transition: color 0.5s ease; }
+        .footer-column a { color: #8892b0; text-decoration: none; transition: color 0.3s; font-size: 0.95rem; }
+        .footer-column a:hover { color: #66fcf1; }
+        .footer-bottom { text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 30px; color: #45a29e; font-size: 0.9rem; }
+
+        /* --- Success Popup Styles --- */
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 12, 16, 0.8); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; visibility: hidden; transition: opacity 0.4s, visibility 0.4s; }
+        .popup-overlay.active { opacity: 1; visibility: visible; }
+        .popup-content { background: rgba(31, 40, 51, 0.95); padding: 50px; border-radius: 20px; border: 1px solid #66fcf1; text-align: center; box-shadow: 0 10px 40px rgba(102, 252, 241, 0.3); transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: 90%; max-width: 400px; }
+        .popup-overlay.active .popup-content { transform: scale(1); }
+        .popup-content h3 { color: #66fcf1; margin-bottom: 15px; font-size: 2.2rem; }
+        .popup-content p { color: #c5c6c7; margin-bottom: 30px; font-size: 1.1rem; }
+        .popup-content button { background: #66fcf1; color: #0b0c10; padding: 12px 30px; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer;}
+
+        /* --- LIGHT MODE THEME OVERRIDES --- */
+        body.light-mode { background: linear-gradient(-45deg, #f8fafc, #e2e8f0, #f1f5f9, #cbd5e1); color: #475569; }
+        body.light-mode h1, body.light-mode h2.section-title, body.light-mode .footer-left h3, body.light-mode .footer-column h4 { color: #1e293b; text-shadow: none; }
+        body.light-mode .typewriter-container, body.light-mode .card h3 { color: #0284c7; }
+        body.light-mode nav { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.05); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); }
+        body.light-mode nav h2 { color: #1e293b; text-shadow: none; }
+        body.light-mode nav ul li a { color: #64748b; }
+        body.light-mode nav ul li a:hover, body.light-mode .theme-toggle:hover { color: #0284c7; }
+        body.light-mode nav ul li a.active { color: #ffffff; background-color: #0284c7; box-shadow: 0 0 15px rgba(2, 132, 199, 0.4); }
+        body.light-mode .theme-toggle { color: #64748b; }
+        body.light-mode .profile-pic { border-color: #0284c7; box-shadow: 0 0 10px rgba(2, 132, 199, 0.3); }
+        body.light-mode .card, body.light-mode .contact-form, body.light-mode .popup-content { background: rgba(255, 255, 255, 0.7); border-top: 1px solid rgba(255, 255, 255, 0.9); border-left: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 15px 25px rgba(0, 0, 0, 0.05); }
+        body.light-mode .card:hover { background: rgba(255, 255, 255, 1); box-shadow: 0 20px 40px rgba(2, 132, 199, 0.15); }
+        body.light-mode .contact-form input, body.light-mode .contact-form select, body.light-mode .contact-form textarea { background: rgba(255, 255, 255, 0.8); color: #0f172a; border-color: rgba(0,0,0,0.1); }
+        body.light-mode .contact-form select option { background: #ffffff; color: #0f172a; }
+        body.light-mode .contact-form input:focus, body.light-mode .contact-form textarea:focus, body.light-mode .contact-form select:focus { border-color: #0284c7; box-shadow: 0 0 10px rgba(2, 132, 199, 0.2); }
+        body.light-mode .contact-form button, body.light-mode .popup-content button { color: #0284c7; border-color: #0284c7; }
+        body.light-mode .contact-form button::before { background: #0284c7; }
+        body.light-mode .contact-form button:hover, body.light-mode .popup-content button:hover { color: #ffffff; }
+        body.light-mode .cursor { border-color: #0284c7; box-shadow: 0 0 10px #0284c7; }
+        body.light-mode .cursor.hovering { background-color: rgba(2, 132, 199, 0.1); }
+        body.light-mode .orb-1 { background: rgba(2, 132, 199, 0.2); }
+        body.light-mode .orb-2 { background: rgba(14, 165, 233, 0.2); }
+        body.light-mode .complex-footer { background: #f8fafc; border-top: 1px solid rgba(0, 0, 0, 0.05); }
+        body.light-mode .social-icons a, body.light-mode .footer-column a { color: #64748b; }
+        body.light-mode .social-icons a:hover, body.light-mode .footer-column a:hover { color: #0284c7; }
+        body.light-mode .popup-content h3 { color: #1e293b; }
+        body.light-mode .popup-overlay { background: rgba(248, 250, 252, 0.8); }
+
+        /* --- MOBILE RESPONSIVENESS (HEAVILY IMPROVED) --- */
+        @media (max-width: 768px) {
+            * { cursor: auto !important; }
+            .cursor { display: none !important; }
+            
+            /* Nav Stabilization: Tighter padding, simpler layout */
+            nav { padding: 8px 15px; width: 95%; top: 15px; justify-content: space-between; max-height: 60px; }
+            .brand { gap: 10px; }
+            .brand h2 { display: none; } /* Hide Text Logo on Mobile to save space */
+            .profile-pic { width: 35px; height: 35px; border-width: 1.5px; }
+            
+            nav ul { gap: 5px; justify-content: flex-end; width: auto; }
+            nav ul li a { padding: 6px 10px; font-size: 0.8rem; letter-spacing: 0.5px; } 
+            
+            .theme-toggle { padding: 4px; margin-left: 5px; }
+            .theme-toggle svg { width: 20px; height: 20px; }
+
+            /* Text & Layout Sizing */
+            h1 { font-size: 2.5rem; margin-bottom: 15px; }
+            .typewriter-container { font-size: 1.2rem; min-height: 30px; margin-bottom: 20px;}
+            h2.section-title { font-size: 2rem; margin-bottom: 25px; }
+            p.subtitle { font-size: 0.95rem; padding: 0 15px; }
+            
+            /* Fixed Spacing & Dimensions */
+            section { padding: 100px 5% 50px; min-height: auto; }
+            
+            /* Grid Fix: 1 Column ensures stability */
+            .grid { grid-template-columns: 1fr; gap: 20px; } 
+            
+            /* Visual Cleanup */
+            .card { padding: 25px 20px; background: rgba(255,255,255,0.05); } /* Slightly more opaque on mobile */
+            .contact-form { padding: 25px 20px; }
+            
+            /* Input Fix: Prevents iOS zoom on focus */
+            .contact-form input, .contact-form select, .contact-form textarea { font-size: 16px; padding: 12px; }
+            
+            /* Tame the Orbs: Smaller & less intrusive */
+            .orb { opacity: 0.3; }
+            .orb-1 { width: 200px; height: 200px; top: 5%; left: -10%; }
+            .orb-2 { width: 250px; height: 250px; bottom: 5%; right: -10%; }
+
+            /* Footer Alignment */
+            .complex-footer { padding: 50px 5% 20px; text-align: center; }
+            .footer-content { flex-direction: column; gap: 40px; align-items: center; }
+            .footer-left { display: flex; flex-direction: column; align-items: center; }
+            .social-icons { justify-content: center; gap: 20px; }
+            .footer-right { flex-direction: column; gap: 30px; width: 100%; align-items: center; }
+            .footer-column { align-items: center; }
+        }
+
+        /* Small Phones (iPhone SE, etc.) */
+        @media (max-width: 380px) {
+            nav ul li a { padding: 5px 6px; font-size: 0.7rem; }
+            h1 { font-size: 2rem; }
+            .nav-link { font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor" id="cursor"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="popup-overlay" id="successPopup">
+        <div class="popup-content">
+            <h3>Message Sent! 🚀</h3>
+            <p>Thanks for reaching out. I'll get back to you shortly.</p>
+            <button id="closePopupBtn">Awesome</button>
+        </div>
+    </div>
+
+    <nav>
+        <div class="brand">
+            <img src="profile.png" alt="Profile Picture" class="profile-pic">
+            <h2>Mohamed Monsef</h2>
+        </div>
+        <ul>
+            <li><a href="#home" class="nav-link active">Home</a></li>
+            <li><a href="#projects" class="nav-link">Projects</a></li>
+            <li><a href="#about" class="nav-link">About</a></li>
+            <li><a href="#contact" class="nav-link">Contact</a></li>
+            
+            <li>
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme">
+                    <svg id="sunIcon" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18.75a.75.75 0 01.75.75V21.75a.75.75 0 01-1.5 0V19.5a.75.75 0 01.75-.75zM6.166 17.834a.75.75 0 00-1.06 1.06l1.59 1.591a.75.75 0 101.06-1.061l-1.59-1.59zM4.5 12a.75.75 0 01-.75.75H1.5a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM6.166 6.166a.75.75 0 001.06 1.06l-1.59 1.591a.75.75 0 00-1.06-1.06l1.59-1.59z"></path></svg>
+                    <svg id="moonIcon" style="display: none;" viewBox="0 0 24 24"><path d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z"></path></svg>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <section id="home" class="hidden">
+        <h1>Hi, I'm Mohamed Monsef</h1>
+        <div class="typewriter-container"><span id="typed-text"></span><span class="cursor-blink">|</span></div>
+        <p class="subtitle">A dynamic, living portfolio showcasing my ideas, research, and creative pursuits. Scroll down to explore.</p>
+    </section>
+
+    <section id="projects" class="hidden">
+        <h2 class="section-title">Current Interests & Projects</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Natural Adhesives Research</h3>
+                <p>An ongoing study into creating strong adhesives entirely from non-manufactured, natural materials, focusing on specific properties and testing their fire resistance.</p>
+            </div>
+            <div class="card">
+                <h3>Apparel Aesthetics</h3>
+                <p>A curated visual gallery focusing on athletic design. Highlighting classic, clean looks like the iconic black t-shirt featuring the signature Nike logo.</p>
+            </div>
+            <div class="card">
+                <h3>Web Development</h3>
+                <p>Building dynamic, interactive web spaces using HTML, CSS, and modern JavaScript to bring creative ideas to life on the screen.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="hidden">
+        <h2 class="section-title">About Me</h2>
+        <p class="subtitle">I am a curious creator and researcher with a passion for blending science and design. Whether I'm looking into the chemistry of everyday materials or exploring modern aesthetic trends, I love digging deep into how things are made and how they look.</p>
+    </section>
+
+    <section id="contact" class="hidden">
+        <h2 class="section-title">Get In Touch</h2>
+        <p class="subtitle">Interested in discussing materials, design, or coding? Send me a message below.</p>
+        
+        <form class="contact-form" id="contactForm" action="https://formspree.io/f/mnjbvpqy" method="POST">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email Address" required>
+            
+            <select name="inquiry_type" required>
+                <option value="" disabled selected>What would you like to discuss?</option>
+                <option value="adhesives">Natural Adhesives & Materials Research</option>
+                <option value="apparel">Sportswear & Apparel Design</option>
+                <option value="web_dev">Web Development & Coding</option>
+                <option value="general">Just saying hello / General Inquiry</option>
+            </select>
+            
+            <textarea name="message" rows="6" placeholder="Write your message here..." required></textarea>
+            <button type="submit" id="submitBtn">Send Message</button>
+        </form>
+    </section>
+
+    <footer class="complex-footer">
+        <div class="footer-content">
+            
+            <div class="footer-left">
+                <h3>Mohamed Monsef</h3>
+                <p class="footer-title">Materials Researcher & Creative Coder</p>
+                <div class="social-icons">
+                    <a href="https://www.instagram.com/mmonsefofficial?igsh=MTVwaWltcnMwa3c5cg%3D%3D&utm_source=qr" aria-label="Instagram">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </a>
+                    <a href="https://www.linkedin.com/in/mohamed-monsef-687b302b2?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" aria-label="LinkedIn">
+                        <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                    </a>
+                    <a href="https://x.com/mmonsefofficial?s=21" aria-label="X">
+                        <svg viewBox="0 0 24 24"><path d="M4 4l11.733 16h4.267l-11.733 -16z"></path><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path></svg>
+                    </a>
+                    <a href="https://www.facebook.com/share/1AXaYwRkhf/?mibextid=wwXIfr" aria-label="Facebook">
+                        <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                    </a>
+                    <a href="https://youtube.com/@mmonsefofficial?si=nSpp2LsQV1ZzQEow" aria-label="YouTube">
+                        <svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+                    </a>
+                    
+                    <a href="https://wa.me/2001559918237" aria-label="WhatsApp">
+                        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="footer-right">
+                <div class="footer-column">
+                    <h4>Blog</h4>
+                    <a href="#">Posts</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Personal</h4>
+                    <a href="#">Inspiration</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Career</h4>
+                    <a href="#">Achievements</a>
+                    <a href="#">Availability</a>
+                    <a href="#">Resume</a>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 Mohamed Monsef. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 1. Theme Toggle Memory & Switch
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'light') {
+            document.body.classList.add('light-mode');
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            if (document.body.classList.contains('light-mode')) {
+                localStorage.setItem('theme', 'light');
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                localStorage.setItem('theme', 'dark');
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+        });
+
+        // 2. Custom Cursor
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+        });
+        const interactives = document.querySelectorAll('a, button, input, select, textarea, .card');
+        interactives.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+        });
+
+        // 3. Scroll Animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('show'); });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('.hidden').forEach(el => observer.observe(el));
+
+        // 4. Scroll Spy for Nav
+        const sections = document.querySelectorAll("section");
+        const navLinks = document.querySelectorAll(".nav-link");
+
+        window.addEventListener("scroll", () => {
+            let current = "";
+            sections.forEach((section) => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 250) {
+                    current = section.getAttribute("id");
+                }
+            });
+
+            navLinks.forEach((a) => {
+                a.classList.remove("active");
+                if (a.getAttribute("href").includes(current)) {
+                    a.classList.add("active");
+                }
+            });
+        });
+
+        // 5. Typewriter Effect
+        const words = ["Materials Researcher.", "Apparel Enthusiast.", "Creative Coder."];
+        let wIdx = 0, cIdx = 0, isDel = false;
+        const textSpan = document.getElementById("typed-text");
+        function typeEffect() {
+            const word = words[wIdx];
+            if (isDel) { textSpan.textContent = word.substring(0, cIdx - 1); cIdx--; } 
+            else { textSpan.textContent = word.substring(0, cIdx + 1); cIdx++; }
+            let spd = isDel ? 50 : 100;
+            if (!isDel && cIdx === word.length) { spd = 2000; isDel = true; } 
+            else if (isDel && cIdx === 0) { isDel = false; wIdx = (wIdx + 1) % words.length; spd = 500; }
+            setTimeout(typeEffect, spd);
+        }
+        document.addEventListener("DOMContentLoaded", () => setTimeout(typeEffect, 1000));
+
+        // 6. Background Form Submission
+        const contactForm = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successPopup = document.getElementById('successPopup');
+        const closePopupBtn = document.getElementById('closePopupBtn');
+
+        contactForm.addEventListener('submit', async function(event) {
+            event.preventDefault(); 
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = 'Sending...'; 
+            const formData = new FormData(contactForm);
+            try {
+                const response = await fetch(contactForm.action, {
+                    method: 'POST', body: formData, headers: { 'Accept': 'application/json' }
+                });
+                if (response.ok) {
+                    successPopup.classList.add('active'); 
+                    contactForm.reset(); 
+                } else { alert("Oops! There was a problem submitting your form."); }
+            } catch (error) { alert("Oops! There was a problem submitting your form."); } 
+            finally { submitBtn.textContent = originalBtnText; }
+        });
+        closePopupBtn.addEventListener('click', () => successPopup.classList.remove('active'));
+
+        // 7. Prevent Copying and Right-Clicking Shield
+        document.addEventListener('contextmenu', event => event.preventDefault()); 
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C' || e.key === 'x' || e.key === 'X')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
